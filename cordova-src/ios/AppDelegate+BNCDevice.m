@@ -30,13 +30,19 @@ static BOOL swizzled = NO;
         if (swizzled) {
             return [self swizzleApplication:application continueUserActivity:userActivity restorationHandler:restorationHandler];
         }
-        
         return NO;
+    } else {
+        NSString *url = [userActivity.webpageURL absoluteString];
+        if ([url rangeOfString:@"://bnc.lt"].location == NSNotFound) {
+            if (swizzled) {
+                return [self swizzleApplication:application continueUserActivity:userActivity restorationHandler:restorationHandler];
+            }
+            return NO;
+        } else {
+            BNCDevice *device = [self.viewController getCommandInstance:@"BranchDevice"];
+            return [device handleUserActivity:userActivity];
+        }
     }
-    
-    BNCDevice *device = [self.viewController getCommandInstance:@"BranchDevice"];
-    
-    return [device handleUserActivity:userActivity];
 }
 
 @end
